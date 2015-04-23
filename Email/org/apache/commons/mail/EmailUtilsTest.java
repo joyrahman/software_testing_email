@@ -13,14 +13,38 @@ public class EmailUtilsTest {
 	}
 	@Test
 	public void testIsEmpty() {
-		boolean result = EmailUtils.isEmpty("abcdefghijklmnopqr");
+		boolean expected = true;
+		boolean result = true;
+		String[] input = {"abcdefghijklmnop","test",""};
+		for (String i : input)
+		{
+			result = EmailUtils.isEmpty(i);
+			assertEquals(result,expected);	
+			
+		}
 		//fail("Not yet implemented");
-		assertEquals(result,true);
+		//assertEquals(result,expected);
 	}
 
 	@Test
 	public void testIsNotEmpty() {
-		fail("Not yet implemented");
+		boolean expected = true;
+		boolean result = true;
+		String[] input = {"abcdefghijklmnopqrst","test",""};
+		for (String i : input)
+		{
+			result = EmailUtils.isNotEmpty(i);
+			assertEquals(result,expected);	
+			/*
+			if (result==false){
+				break;
+			}
+			*/
+		}
+		//assertEquals(result,expected);	
+
+		//boolean result = EmailUtils.isNotEmpty(input[]);
+		//assertEquals(result, expected);
 	}
 
 	@Test
