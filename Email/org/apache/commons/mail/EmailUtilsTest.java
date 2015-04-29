@@ -46,7 +46,7 @@ public class EmailUtilsTest {
 		//boolean result = EmailUtils.isNotEmpty(input[]);
 		//assertEquals(result, expected);
 	}
-
+	/*
 	@Test
 	public void testNotNull() {
 		fail("Not yet implemented");
@@ -66,5 +66,6 @@ public class EmailUtilsTest {
 	public void testWriteMimeMessage() {
 		fail("Not yet implemented");
 	}
+	*/
 
 }
