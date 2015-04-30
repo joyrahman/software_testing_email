@@ -2,6 +2,7 @@ package org.apache.commons.mail;
 
 import static org.junit.Assert.*;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
@@ -9,6 +10,7 @@ import java.util.Properties;
 
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
+import javax.mail.internet.MimeMessage;
 import javax.naming.NamingException;
 
 import org.junit.Before;
@@ -501,392 +503,176 @@ public class EmailTest {
 		
 		email_obj.setHeaders(input);
 	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#addHeader(java.lang.String, java.lang.String)}.
-//	 */
-//	@Test
-//	public void testAddHeader() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#setSubject(java.lang.String)}.
-//	 */
-//	@Test
-//	public void testSetSubject() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#setBounceAddress(java.lang.String)}.
-//	 */
-//	@Test
-//	public void testSetBounceAddress() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#setMsg(java.lang.String)}.
-//	 */
-//	@Test
-//	public void testSetMsg() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#buildMimeMessage()}.
-//	 */
-//	@Test
-//	public void testBuildMimeMessage() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#getMimeMessage()}.
-//	 */
-//	@Test
-//	public void testGetMimeMessage() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#send()}.
-//	 */
-//
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#setSentDate(java.util.Date)}.
-//	 */
-//	@Test
-//	public void testSetSentDate() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#getSentDate()}.
-//	 */
-//	@Test
-//	public void testGetSentDate() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#getSubject()}.
-//	 */
-//	@Test
-//	public void testGetSubject() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#getFromAddress()}.
-//	 */
-//	@Test
-//	public void testGetFromAddress() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#getHostName()}.
-//	 */
-//	@Test
-//	public void testGetHostName() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#getSmtpPort()}.
-//	 */
-//	@Test
-//	public void testGetSmtpPort() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#isStartTLSRequired()}.
-//	 */
-//	@Test
-//	public void testIsStartTLSRequired() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#isStartTLSEnabled()}.
-//	 */
-//	@Test
-//	public void testIsStartTLSEnabled() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#isTLS()}.
-//	 */
-//	@Test
-//	public void testIsTLS() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#toInternetAddressArray(java.util.List)}.
-//	 */
-//	@Test
-//	public void testToInternetAddressArray() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#setPopBeforeSmtp(boolean, java.lang.String, java.lang.String, java.lang.String)}.
-//	 */
-//	@Test
-//	public void testSetPopBeforeSmtp() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#isSSL()}.
-//	 */
-//	@Test
-//	public void testIsSSL() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#isSSLOnConnect()}.
-//	 */
-//	@Test
-//	public void testIsSSLOnConnect() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#setSSL(boolean)}.
-//	 */
-//	@Test
-//	public void testSetSSL() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#setSSLOnConnect(boolean)}.
-//	 */
-//	@Test
-//	public void testSetSSLOnConnect() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#isSSLCheckServerIdentity()}.
-//	 */
-//	@Test
-//	public void testIsSSLCheckServerIdentity() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#setSSLCheckServerIdentity(boolean)}.
-//	 */
-//	@Test
-//	public void testSetSSLCheckServerIdentity() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#getSslSmtpPort()}.
-//	 */
-//	@Test
-//	public void testGetSslSmtpPort() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#setSslSmtpPort(java.lang.String)}.
-//	 */
-//	@Test
-//	public void testSetSslSmtpPort() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#isSendPartial()}.
-//	 */
-//	@Test
-//	public void testIsSendPartial() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#setSendPartial(boolean)}.
-//	 */
-//	@Test
-//	public void testSetSendPartial() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#getToAddresses()}.
-//	 */
-//	@Test
-//	public void testGetToAddresses() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#getCcAddresses()}.
-//	 */
-//	@Test
-//	public void testGetCcAddresses() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#getBccAddresses()}.
-//	 */
-//	@Test
-//	public void testGetBccAddresses() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#getReplyToAddresses()}.
-//	 */
-//	@Test
-//	public void testGetReplyToAddresses() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#getSocketConnectionTimeout()}.
-//	 */
-//	@Test
-//	public void testGetSocketConnectionTimeout() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#setSocketConnectionTimeout(int)}.
-//	 */
-//	@Test
-//	public void testSetSocketConnectionTimeout() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#getSocketTimeout()}.
-//	 */
-//	@Test
-//	public void testGetSocketTimeout() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#setSocketTimeout(int)}.
-//	 */
-//	@Test
-//	public void testSetSocketTimeout() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#createMimeMessage(javax.mail.Session)}.
-//	 */
-//	@Test
-//	public void testCreateMimeMessage() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
+
+	/**
+	 * Test method for {@link org.apache.commons.mail.Email#addHeader(java.lang.String, java.lang.String)}.
+	 * Adds a header ( name, value ) to the headers Map.
+     *
+
+     * @param name A String with the name.
+     * @param value A String with the value.
+     * @since 1.0
+     * @throws IllegalArgumentException if either {@code name} or {@code value} is null or empty
+   
+	 */
+	@Test(expected=IllegalArgumentException.class)
+	public void testAddHeader() {
+		email_obj.addHeader("test", null);
+		email_obj.addHeader(null, null);
+	}
+
+	/**
+	 * Test method for {@link org.apache.commons.mail.Email#setSubject(java.lang.String)}.
+    * Set the email subject.
+    *
+    * @param aSubject A String.
+    * @return An Email.
+    * @since 1.0
+	*/
+	
+	@Test
+	public void testSetSubject() {
+
+		Email test = email_obj.setSubject("test@gmail.com");
+		assertTrue(test instanceof Email );
+		//asserttEqual(Email.class, test.getClass());
+	}
+
+	/**
+	 * Test method for {@link org.apache.commons.mail.Email#setBounceAddress(java.lang.String)}.
+	 * Set the "bounce address" - the address to which undeliverable messages
+     * will be returned.  If this value is never set, then the message will be
+     * sent to the address specified with the System property "mail.smtp.from",
+     * or if that value is not set, then to the "from" address.
+     *
+     * @param email A String.
+     * @return An Email.
+     * @throws IllegalStateException when the mail session is already initialized
+     * @since 1.0
+	 */
+	@Test
+	public void testSetBounceAddress() {
+		Email test = email_obj.setBounceAddress("test");
+		assertTrue(test instanceof Email );
+	}
+
+
+    /**
+     * Does the work of actually building the MimeMessage. Please note that
+     * a user rarely calls this method directly and only if he/she is
+     * interested in the sending the underlying MimeMessage without
+     * commons-email.
+     *
+     * @throws IllegalStateException if the MimeMessage was already built
+     * @throws EmailException if there was an error.
+     * @since 1.0
+     */
+	
+	@Test(expected=EmailException.class)
+	public void testBuildMimeMessage() throws EmailException {
+		email_obj.buildMimeMessage();
+	}
+
+
+	/**
+	 * Test method for {@link org.apache.commons.mail.Email#getMimeMessage()}.
+	 *     /**
+     * Returns the internal MimeMessage. Please not that the
+     * MimeMessage is build by the buildMimeMessage() method.
+     *
+     * @return the MimeMessage
+	 * @throws EmailException 
+     *
+	 */
+	@Test
+	public void testGetMimeMessage() throws EmailException {
+		email_obj.buildMimeMessage();
+		MimeMessage test = email_obj.getMimeMessage();
+		assertTrue(test instanceof MimeMessage);
+	}
+
+	/** Test method for setSentDate
+     * Expected : Sets the sent date for the email. The sent date will default to the
+     * current date if not explicitly set.
+     *
+     * @param date Date to use as the sent date on the email
+     */
+	
+	@Test 
+	public void testSetSentDate(){
+		email_obj.setSentDate(null);
+		assertTrue(email_obj.sentDate!=null);
+		
+	}
+
+	/**
+	* Test method for {@link org.apache.commons.mail.Email#getSentDate()}.
+    * Gets the sent date for the email.
+    *
+    * @return date to be used as the sent date for the email
+    * @since 1.0
+	*/
+	@Test
+	public void testGetSentDate() {
+		Date test = email_obj.getSentDate();
+		assertTrue(test instanceof Date);
+	}
+
+	/* Test method for getHostName()
+	 * Gets the host name of the SMTP server,
+     *
+     * @return host name
+     */
+
+	@Test
+	public void testGetHostName() {
+		String input = "localhost";
+		email_obj.hostName=input;
+		String result = email_obj.getHostName();
+		assertEquals(result, input);
+	}
+
+	/**
+	 * Test method for getSmtpPort()}.
+	 */
+	@Test
+	public void testGetSmtpPort() {
+		String result = email_obj.getSmtpPort();
+		assertTrue(result instanceof String);
+	}
+
+	/**
+	 * Test method for {@link org.apache.commons.mail.Email#getSslSmtpPort()}.
+    * Returns the current SSL port used by the SMTP transport.
+    *
+    * @return the current SSL port used by the SMTP transport
+	 */
+	@Test
+	public void testGetSslSmtpPort() {
+		String result = email_obj.getSslSmtpPort();
+		assertTrue(result instanceof String);
+	}
+
+	/**
+	 * Test method for {@link org.apache.commons.mail.Email#createMimeMessage(javax.mail.Session)}.
+	 *
+     * Factory method to create a customized MimeMessage which can be
+     * implemented by a derived class, e.g. to set the message id.
+     *
+     * @param aSession mail session to be used
+     * @return the newly created message
+	 */
+	@Test
+	public void testCreateMimeMessage() {
+		//Session aSession = new Session(null, null);
+		MimeMessage output = email_obj.createMimeMessage(null);
+		assertTrue(output instanceof MimeMessage);
+		
+	}
+
 //	/**
 //	 * Test method for {@link java.lang.Object#Object()}.
-//	 */
-//	@Test
-//	public void testObject() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link java.lang.Object#getClass()}.
-//	 */
-//	@Test
-//	public void testGetClass() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link java.lang.Object#hashCode()}.
-//	 */
-//	@Test
-//	public void testHashCode() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link java.lang.Object#equals(java.lang.Object)}.
-//	 */
-//	@Test
-//	public void testEquals() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link java.lang.Object#clone()}.
-//	 */
-//	@Test
-//	public void testClone() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link java.lang.Object#toString()}.
-//	 */
-//	@Test
-//	public void testToString() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link java.lang.Object#notify()}.
-//	 */
-//	@Test
-//	public void testNotify() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link java.lang.Object#notifyAll()}.
-//	 */
-//	@Test
-//	public void testNotifyAll() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link java.lang.Object#wait(long)}.
-//	 */
-//	@Test
-//	public void testWaitLong() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link java.lang.Object#wait(long, int)}.
-//	 */
-//	@Test
-//	public void testWaitLongInt() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link java.lang.Object#wait()}.
-//	 */
-//	@Test
-//	public void testWait() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link java.lang.Object#finalize()}.
-//	 */
+
 //	@Test
 //	public void testFinalize() {
 //		fail("Not yet implemented"); // TODO
