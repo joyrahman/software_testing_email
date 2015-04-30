@@ -2,6 +2,9 @@ package org.apache.commons.mail;
 
 import static org.junit.Assert.*;
 
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.mail.PasswordAuthentication;
@@ -325,126 +328,179 @@ public class EmailTest {
 	public void testSetTo() throws EmailException {
 		email_obj.setTo(null);
 	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#addCc(java.lang.String)}.
-//	 */
-//	@Test
-//	public void testAddCcString() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#addCc(java.lang.String[])}.
-//	 */
-//	@Test
-//	public void testAddCcStringArray() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#addCc(java.lang.String, java.lang.String)}.
-//	 */
-//	@Test
-//	public void testAddCcStringString() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#addCc(java.lang.String, java.lang.String, java.lang.String)}.
-//	 */
-//	@Test
-//	public void testAddCcStringStringString() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#setCc(java.util.Collection)}.
-//	 */
-//	@Test
-//	public void testSetCc() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#addBcc(java.lang.String)}.
-//	 */
-//	@Test
-//	public void testAddBccString() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#addBcc(java.lang.String[])}.
-//	 */
-//	@Test
-//	public void testAddBccStringArray() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#addBcc(java.lang.String, java.lang.String)}.
-//	 */
-//	@Test
-//	public void testAddBccStringString() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#addBcc(java.lang.String, java.lang.String, java.lang.String)}.
-//	 */
-//	@Test
-//	public void testAddBccStringStringString() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#setBcc(java.util.Collection)}.
-//	 */
-//	@Test
-//	public void testSetBcc() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#addReplyTo(java.lang.String)}.
-//	 */
-//	@Test
-//	public void testAddReplyToString() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#addReplyTo(java.lang.String, java.lang.String)}.
-//	 */
-//	@Test
-//	public void testAddReplyToStringString() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#addReplyTo(java.lang.String, java.lang.String, java.lang.String)}.
-//	 */
-//	@Test
-//	public void testAddReplyToStringStringString() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#setReplyTo(java.util.Collection)}.
-//	 */
-//	@Test
-//	public void testSetReplyTo() {
-//		fail("Not yet implemented"); // TODO
-//	}
-//
-//	/**
-//	 * Test method for {@link org.apache.commons.mail.Email#setHeaders(java.util.Map)}.
-//	 */
-//	@Test
-//	public void testSetHeaders() {
-//		fail("Not yet implemented"); // TODO
-//	}
+
+	/**
+	 * Test method for addCc(java.lang.String)}.
+	 * @param email A String.
+     * @return An Email.
+     * @throws EmailException Indicates an invalid email address.
+	 */
+	@Test(expected=EmailException.class)
+	public void testAddCcString() throws EmailException{
+		email_obj.addCc("test");
+	}
+
+	/**
+	 * Test method for {@link org.apache.commons.mail.Email#addCc(java.lang.String[])}.
+	 * @param email A String.
+     * @return An Email.
+     * @throws EmailException Indicates an invalid email address.
+	 */
+	@Test(expected=EmailException.class)
+	public void testAddCcStringArray() throws EmailException{
+		String input[] = {"test","test2"};
+		email_obj.addCc(input);
+	}
+
+	/**
+	 * Test method for {@link org.apache.commons.mail.Email#addCc(java.lang.String, java.lang.String)}.
+     * @param email A String.
+     * @param name A String.
+     * @return An Email.
+     * @throws EmailException Indicates an invalid email address.
+	 */
+	@Test(expected=EmailException.class)
+	public void testAddCcStringString() throws EmailException{
+		email_obj.addCc("test_email","test_name");
+	}
+
+	/**
+	 * Test method for {@link org.apache.commons.mail.Email#addCc(java.lang.String, java.lang.String, java.lang.String)}.
+     * Add a recipient CC to the email using the specified address, personal
+     * name, and charset encoding for the name.
+     * @param email A String.
+     * @param name A String.
+     * @param charset The charset to encode the name with.
+     * @return An Email.
+     * @throws EmailException Indicates an invalid email address or charset.
+	*/
+	@Test(expected=EmailException.class)
+	public void testAddCcStringStringString() throws EmailException {
+			email_obj.addCc("test_email","test_name","UTF-16");
+	}
+	
+
+
+    /**
+    * Test method for {@link org.apache.commons.mail.Email#setCc(java.util.Collection)}.
+    * Set a list of "CC" addresses. All elements in the specified
+    * <code>Collection</code> are expected to be of type
+    * <code>java.mail.internet.InternetAddress</code>.
+    * @param aCollection collection of <code>InternetAddress</code> objects.
+    * @return An Email.
+    * @throws EmailException Indicates an invalid email address. 
+	*/
+	@Test(expected=EmailException.class)
+	public void testSetCc() throws EmailException {
+		email_obj.setCc(null);
+	}
+
+
+	/**
+	 * Test method for addBcc(java.lang.String)}.
+	 * @param email A String.
+     * @return An Email.
+     * @throws EmailException Indicates an invalid email address.
+	 */
+	@Test(expected=EmailException.class)
+	public void testAddBccString() throws EmailException{
+		email_obj.addBcc("test");
+	}
+
+	@Test(expected=EmailException.class)
+	public void testAddBccStringArray() throws EmailException{
+		String input[] = {"test","test2"};
+		email_obj.addBcc(input);
+	}
+
+	@Test(expected=EmailException.class)
+	public void testAddBccStringString() throws EmailException{
+		email_obj.addBcc("test_email","test_name");
+	}
+
+	@Test(expected=EmailException.class)
+	public void testAddBccStringStringString() throws EmailException {
+			email_obj.addBcc("test_email","test_name","UTF-16");
+	}
+	
+	
+    /**
+    * Test method for {@link org.apache.commons.mail.Email#setBcc(java.util.Collection)}.
+    * Set a list of "BCC" addresses. All elements in the specified
+    * <code>Collection</code> are expected to be of type
+    * <code>java.mail.internet.InternetAddress</code>.
+    * @param aCollection collection of <code>InternetAddress</code> objects.
+    * @return An Email.
+    * @throws EmailException Indicates an invalid email address. 
+	*/
+	@Test(expected=EmailException.class)
+	public void testSetBcc() throws EmailException {
+		email_obj.setBcc(null);
+	}
+	/**
+	 * Test method for {@link org.apache.commons.mail.Email#addReplyTo(java.lang.String)}.
+	 * Add a reply to address to the email. The email
+     * address will also be used as the personal name.
+     * The name will be encoded by the charset of {@link #setCharset(java.lang.String) setCharset()}.
+     * If it is not set, it will be encoded using
+     * the Java platform's default charset (UTF-16) if it contains
+     * non-ASCII characters; otherwise, it is used as is.
+     *
+     * @param email A String.
+     * @return An Email.
+     * @throws EmailException Indicates an invalid email address
+ 
+	 */
+
+	@Test(expected=EmailException.class)
+	public void testAddReplyToString() throws EmailException {
+		email_obj.addReplyTo("test");
+	}
+	@Test(expected=EmailException.class)
+	public void testAddReplyToStringString() throws EmailException{
+		email_obj.addBcc("test_email","test_name");
+	}
+	@Test(expected=EmailException.class)
+	public void testAddReplyToStringStringString() throws EmailException{
+		email_obj.addBcc("test_email","test_name","UTF-8");
+	}
+
+
+	/**
+	* Test method for {@link org.apache.commons.mail.Email#setReplyTo(java.util.Collection)}.
+	* Set a list of reply to addresses. All elements in the specified
+    * <code>Collection</code> are expected to be of type
+    * <code>java.mail.internet.InternetAddress</code>.
+    *
+    * @param   aCollection collection of <code>InternetAddress</code> objects
+    * @return  An Email.
+    * @throws EmailException Indicates an invalid email address
+    
+	*/
+	@Test(expected=EmailException.class)
+	public void testSetReplyTo() throws EmailException {
+		email_obj.setReplyTo(null);
+	}
+
+	/**
+	 * Test method for {@link org.apache.commons.mail.Email#setHeaders(java.util.Map)}.
+	 * Used to specify the mail headers.  Example:
+     *
+     * X-Mailer: Sendmail, X-Priority: 1( highest )
+     * or  2( high ) 3( normal ) 4( low ) and 5( lowest )
+     * Disposition-Notification-To: user@domain.net
+     *
+     * @param map A Map.
+     * @throws IllegalArgumentException if either of the provided header / value is null or empty
+	 */
+	@Test(expected=IllegalArgumentException.class)
+	public void testSetHeaders() {
+		Map<String, String> input = new HashMap<String, String>();
+		input.put("test1","test1");
+		input.put("test2","test2");
+		
+		email_obj.setHeaders(input);
+	}
 //
 //	/**
 //	 * Test method for {@link org.apache.commons.mail.Email#addHeader(java.lang.String, java.lang.String)}.
