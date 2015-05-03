@@ -1,0 +1,409 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../.resources/report.gif" type="image/gif"/><title>MimeMessageParser.java</title><link rel="stylesheet" href="../../../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../.sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">EmailUtilsTest (May 2, 2015 9:11:25 PM)</a> &gt; <a href="../../index.html" class="el_group">Email</a> &gt; <a href="../index.html" class="el_bundle">Email</a> &gt; <a href="index.source.html" class="el_package">org.apache.commons.mail.util</a> &gt; <span class="el_source">MimeMessageParser.java</span></div><h1>MimeMessageParser.java</h1><pre class="source lang-java linenums">/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the &quot;License&quot;); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.apache.commons.mail.util;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.Part;
+import javax.mail.internet.ContentType;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimePart;
+import javax.mail.internet.MimeUtility;
+import javax.mail.internet.ParseException;
+import javax.mail.util.ByteArrayDataSource;
+
+/**
+ * Parses a MimeMessage and stores the individual parts such a plain text,
+ * HTML text and attachments.
+ *
+ * @since 1.3
+ * @version $Id: MimeMessageParser.java 1606710 2014-06-30 12:29:13Z ggregory $
+ */
+public class MimeMessageParser
+{
+    /** The MimeMessage to convert */
+    private final MimeMessage mimeMessage;
+
+    /** Plain mail content from MimeMessage */
+    private String plainContent;
+
+    /** Html mail content from MimeMessage */
+    private String htmlContent;
+
+    /** List of attachments of MimeMessage */
+    private final List&lt;DataSource&gt; attachmentList;
+
+    /** Is this a Multipart email */
+    private boolean isMultiPart;
+
+    /**
+     * Constructs an instance with the MimeMessage to be extracted.
+     *
+     * @param message the message to parse
+     */
+<span class="nc" id="L73">    public MimeMessageParser(final MimeMessage message)</span>
+    {
+<span class="nc" id="L75">        attachmentList = new ArrayList&lt;DataSource&gt;();</span>
+<span class="nc" id="L76">        this.mimeMessage = message;</span>
+<span class="nc" id="L77">        this.isMultiPart = false;</span>
+<span class="nc" id="L78">    }</span>
+
+    /**
+     * Does the actual extraction.
+     *
+     * @return this instance
+     * @throws Exception parsing the mime message failed
+     */
+    public MimeMessageParser parse() throws Exception
+    {
+<span class="nc" id="L88">        this.parse(null, mimeMessage);</span>
+<span class="nc" id="L89">        return this;</span>
+    }
+
+    /**
+     * @return the 'to' recipients of the message
+     * @throws Exception determining the recipients failed
+     */
+    public List&lt;javax.mail.Address&gt; getTo() throws Exception
+    {
+<span class="nc" id="L98">        final javax.mail.Address[] recipients = this.mimeMessage.getRecipients(Message.RecipientType.TO);</span>
+<span class="nc bnc" id="L99" title="All 2 branches missed.">        return recipients != null ? Arrays.asList(recipients) : new ArrayList&lt;javax.mail.Address&gt;();</span>
+    }
+
+    /**
+     * @return the 'cc' recipients of the message
+     * @throws Exception determining the recipients failed
+     */
+    public List&lt;javax.mail.Address&gt; getCc() throws Exception
+    {
+<span class="nc" id="L108">        final javax.mail.Address[] recipients = this.mimeMessage.getRecipients(Message.RecipientType.CC);</span>
+<span class="nc bnc" id="L109" title="All 2 branches missed.">        return recipients != null ? Arrays.asList(recipients) : new ArrayList&lt;javax.mail.Address&gt;();</span>
+    }
+
+    /**
+     * @return the 'bcc' recipients of the message
+     * @throws Exception determining the recipients failed
+     */
+    public List&lt;javax.mail.Address&gt; getBcc() throws Exception
+    {
+<span class="nc" id="L118">        final javax.mail.Address[] recipients = this.mimeMessage.getRecipients(Message.RecipientType.BCC);</span>
+<span class="nc bnc" id="L119" title="All 2 branches missed.">        return recipients != null ? Arrays.asList(recipients) : new ArrayList&lt;javax.mail.Address&gt;();</span>
+    }
+
+    /**
+     * @return the 'from' field of the message
+     * @throws Exception parsing the mime message failed
+     */
+    public String getFrom() throws Exception
+    {
+<span class="nc" id="L128">        final javax.mail.Address[] addresses = this.mimeMessage.getFrom();</span>
+<span class="nc bnc" id="L129" title="All 4 branches missed.">        if (addresses == null || addresses.length == 0)</span>
+        {
+<span class="nc" id="L131">            return null;</span>
+        }
+        else
+        {
+<span class="nc" id="L135">            return ((InternetAddress) addresses[0]).getAddress();</span>
+        }
+    }
+
+    /**
+     * @return the 'replyTo' address of the email
+     * @throws Exception parsing the mime message failed
+     */
+    public String getReplyTo() throws Exception
+    {
+<span class="nc" id="L145">        final javax.mail.Address[] addresses = this.mimeMessage.getReplyTo();</span>
+<span class="nc bnc" id="L146" title="All 4 branches missed.">        if (addresses == null || addresses.length == 0)</span>
+        {
+<span class="nc" id="L148">            return null;</span>
+        }
+        else
+        {
+<span class="nc" id="L152">            return ((InternetAddress) addresses[0]).getAddress();</span>
+        }
+    }
+
+    /**
+     * @return the mail subject
+     * @throws Exception parsing the mime message failed
+     */
+    public String getSubject() throws Exception
+    {
+<span class="nc" id="L162">        return this.mimeMessage.getSubject();</span>
+    }
+
+    /**
+     * Extracts the content of a MimeMessage recursively.
+     *
+     * @param parent the parent multi-part
+     * @param part   the current MimePart
+     * @throws MessagingException parsing the MimeMessage failed
+     * @throws IOException        parsing the MimeMessage failed
+     */
+    protected void parse(final Multipart parent, final MimePart part)
+        throws MessagingException, IOException
+    {
+<span class="nc bnc" id="L176" title="All 4 branches missed.">        if (isMimeType(part, &quot;text/plain&quot;) &amp;&amp; plainContent == null</span>
+<span class="nc bnc" id="L177" title="All 2 branches missed.">                &amp;&amp; !MimePart.ATTACHMENT.equalsIgnoreCase(part.getDisposition()))</span>
+        {
+<span class="nc" id="L179">            plainContent = (String) part.getContent();</span>
+<span class="nc" id="L180">        }</span>
+        else
+        {
+<span class="nc bnc" id="L183" title="All 4 branches missed.">            if (isMimeType(part, &quot;text/html&quot;) &amp;&amp; htmlContent == null</span>
+<span class="nc bnc" id="L184" title="All 2 branches missed.">                    &amp;&amp; !MimePart.ATTACHMENT.equalsIgnoreCase(part.getDisposition()))</span>
+            {
+<span class="nc" id="L186">                htmlContent = (String) part.getContent();</span>
+<span class="nc" id="L187">            }</span>
+            else
+            {
+<span class="nc bnc" id="L190" title="All 2 branches missed.">                if (isMimeType(part, &quot;multipart/*&quot;))</span>
+                {
+<span class="nc" id="L192">                    this.isMultiPart = true;</span>
+<span class="nc" id="L193">                    final Multipart mp = (Multipart) part.getContent();</span>
+<span class="nc" id="L194">                    final int count = mp.getCount();</span>
+
+                    // iterate over all MimeBodyPart
+
+<span class="nc bnc" id="L198" title="All 2 branches missed.">                    for (int i = 0; i &lt; count; i++)</span>
+                    {
+<span class="nc" id="L200">                        parse(mp, (MimeBodyPart) mp.getBodyPart(i));</span>
+                    }
+<span class="nc" id="L202">                }</span>
+                else
+                {
+<span class="nc" id="L205">                    this.attachmentList.add(createDataSource(parent, part));</span>
+                }
+            }
+        }
+<span class="nc" id="L209">    }</span>
+
+    /**
+     * Checks whether the MimePart contains an object of the given mime type.
+     *
+     * @param part     the current MimePart
+     * @param mimeType the mime type to check
+     * @return {@code true} if the MimePart matches the given mime type, {@code false} otherwise
+     * @throws MessagingException parsing the MimeMessage failed
+     * @throws IOException        parsing the MimeMessage failed
+     */
+    private boolean isMimeType(final MimePart part, final String mimeType)
+        throws MessagingException, IOException
+    {
+        // Do not use part.isMimeType(String) as it is broken for MimeBodyPart
+        // and does not really check the actual content type.
+
+        try
+        {
+<span class="nc" id="L228">            final ContentType ct = new ContentType(part.getDataHandler().getContentType());</span>
+<span class="nc" id="L229">            return ct.match(mimeType);</span>
+        }
+<span class="nc" id="L231">        catch (final ParseException ex)</span>
+        {
+<span class="nc" id="L233">            return part.getContentType().equalsIgnoreCase(mimeType);</span>
+        }
+    }
+
+    /**
+     * Parses the MimePart to create a DataSource.
+     *
+     * @param parent the parent multi-part
+     * @param part   the current part to be processed
+     * @return the DataSource
+     * @throws MessagingException creating the DataSource failed
+     * @throws IOException        creating the DataSource failed
+     */
+    protected DataSource createDataSource(final Multipart parent, final MimePart part)
+        throws MessagingException, IOException
+    {
+<span class="nc" id="L249">        final DataHandler dataHandler = part.getDataHandler();</span>
+<span class="nc" id="L250">        final DataSource dataSource = dataHandler.getDataSource();</span>
+<span class="nc" id="L251">        final String contentType = getBaseMimeType(dataSource.getContentType());</span>
+<span class="nc" id="L252">        final byte[] content = this.getContent(dataSource.getInputStream());</span>
+<span class="nc" id="L253">        final ByteArrayDataSource result = new ByteArrayDataSource(content, contentType);</span>
+<span class="nc" id="L254">        final String dataSourceName = getDataSourceName(part, dataSource);</span>
+
+<span class="nc" id="L256">        result.setName(dataSourceName);</span>
+<span class="nc" id="L257">        return result;</span>
+    }
+
+    /** @return Returns the mimeMessage. */
+    public MimeMessage getMimeMessage()
+    {
+<span class="nc" id="L263">        return mimeMessage;</span>
+    }
+
+    /** @return Returns the isMultiPart. */
+    public boolean isMultipart()
+    {
+<span class="nc" id="L269">        return isMultiPart;</span>
+    }
+
+    /** @return Returns the plainContent if any */
+    public String getPlainContent()
+    {
+<span class="nc" id="L275">        return plainContent;</span>
+    }
+
+    /** @return Returns the attachmentList. */
+    public List&lt;DataSource&gt; getAttachmentList()
+    {
+<span class="nc" id="L281">        return attachmentList;</span>
+    }
+
+    /** @return Returns the htmlContent if any */
+    public String getHtmlContent()
+    {
+<span class="nc" id="L287">        return htmlContent;</span>
+    }
+
+    /** @return true if a plain content is available */
+    public boolean hasPlainContent()
+    {
+<span class="nc bnc" id="L293" title="All 2 branches missed.">        return this.plainContent != null;</span>
+    }
+
+    /** @return true if HTML content is available */
+    public boolean hasHtmlContent()
+    {
+<span class="nc bnc" id="L299" title="All 2 branches missed.">        return this.htmlContent != null;</span>
+    }
+
+    /** @return true if attachments are available */
+    public boolean hasAttachments()
+    {
+<span class="nc bnc" id="L305" title="All 2 branches missed.">        return this.attachmentList.size() &gt; 0;</span>
+    }
+
+    /**
+     * Find an attachment using its name.
+     *
+     * @param name the name of the attachment
+     * @return the corresponding datasource or null if nothing was found
+     */
+    public DataSource findAttachmentByName(final String name)
+    {
+        DataSource dataSource;
+
+<span class="nc bnc" id="L318" title="All 2 branches missed.">        for (int i = 0; i &lt; getAttachmentList().size(); i++)</span>
+        {
+<span class="nc" id="L320">            dataSource = getAttachmentList().get(i);</span>
+<span class="nc bnc" id="L321" title="All 2 branches missed.">            if (name.equalsIgnoreCase(dataSource.getName()))</span>
+            {
+<span class="nc" id="L323">                return dataSource;</span>
+            }
+        }
+
+<span class="nc" id="L327">        return null;</span>
+    }
+
+    /**
+     * Determines the name of the data source if it is not already set.
+     *
+     * @param part the mail part
+     * @param dataSource the data source
+     * @return the name of the data source or {@code null} if no name can be determined
+     * @throws MessagingException accessing the part failed
+     * @throws UnsupportedEncodingException decoding the text failed
+     */
+    protected String getDataSourceName(final Part part, final DataSource dataSource)
+        throws MessagingException, UnsupportedEncodingException
+    {
+<span class="nc" id="L342">        String result = dataSource.getName();</span>
+
+<span class="nc bnc" id="L344" title="All 4 branches missed.">        if (result == null || result.length() == 0)</span>
+        {
+<span class="nc" id="L346">            result = part.getFileName();</span>
+        }
+
+<span class="nc bnc" id="L349" title="All 4 branches missed.">        if (result != null &amp;&amp; result.length() &gt; 0)</span>
+        {
+<span class="nc" id="L351">            result = MimeUtility.decodeText(result);</span>
+<span class="nc" id="L352">        }</span>
+        else
+        {
+<span class="nc" id="L355">            result = null;</span>
+        }
+
+<span class="nc" id="L358">        return result;</span>
+    }
+
+    /**
+     * Read the content of the input stream.
+     *
+     * @param is the input stream to process
+     * @return the content of the input stream
+     * @throws IOException reading the input stream failed
+     */
+    private byte[] getContent(final InputStream is)
+        throws IOException
+    {
+        int ch;
+        byte[] result;
+
+<span class="nc" id="L374">        final ByteArrayOutputStream os = new ByteArrayOutputStream();</span>
+<span class="nc" id="L375">        final BufferedInputStream isReader = new BufferedInputStream(is);</span>
+<span class="nc" id="L376">        final BufferedOutputStream osWriter = new BufferedOutputStream(os);</span>
+
+<span class="nc bnc" id="L378" title="All 2 branches missed.">        while ((ch = isReader.read()) != -1)</span>
+        {
+<span class="nc" id="L380">            osWriter.write(ch);</span>
+        }
+
+<span class="nc" id="L383">        osWriter.flush();</span>
+<span class="nc" id="L384">        result = os.toByteArray();</span>
+<span class="nc" id="L385">        osWriter.close();</span>
+
+<span class="nc" id="L387">        return result;</span>
+    }
+
+    /**
+     * Parses the mimeType.
+     *
+     * @param fullMimeType the mime type from the mail api
+     * @return the real mime type
+     */
+    private String getBaseMimeType(final String fullMimeType)
+    {
+<span class="nc" id="L398">        final int pos = fullMimeType.indexOf(';');</span>
+<span class="nc bnc" id="L399" title="All 2 branches missed.">        if (pos &gt;= 0)</span>
+        {
+<span class="nc" id="L401">            return fullMimeType.substring(0, pos);</span>
+        }
+        else
+        {
+<span class="nc" id="L405">            return fullMimeType;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.2.201409121644</span>EmailUtilsTest (May 2, 2015 9:11:25 PM)</div></body></html>

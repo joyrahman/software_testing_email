@@ -1,0 +1,971 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../.resources/report.gif" type="image/gif"/><title>EmailTest.java</title><link rel="stylesheet" href="../../../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../.sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">EmailUtilsTest (May 2, 2015 9:11:25 PM)</a> &gt; <a href="../../index.html" class="el_group">Email</a> &gt; <a href="../index.html" class="el_bundle">Email</a> &gt; <a href="index.source.html" class="el_package">org.apache.commons.mail</a> &gt; <span class="el_source">EmailTest.java</span></div><h1>EmailTest.java</h1><pre class="source lang-java linenums"><span class="fc" id="L1">/*</span>
+ * CS5123 Course Project
+ * Author : Joy Rahman
+ * Purpose: The purpose of this test unit is to cover 80% of the codes of Email.java 
+ * Requirements: 
+ * 		1. javax.mail.jar has to be under project path
+ * 		2. Credentails and Server detals for active mail server connection 
+ * 			(This file uses a sample google mail account )
+ * 
+ * */
+
+package org.apache.commons.mail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.UnsupportedCharsetException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+import javax.naming.NamingException;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import sun.java2d.pipe.SpanShapeRenderer.Simple;
+
+<span class="fc" id="L40">public class EmailTest {</span>
+	SimpleEmail email_obj;
+	Session googleSession;
+	Session localSession;
+	
+	@Before
+	public void setup() throws EmailException, UnsupportedEncodingException, AddressException{
+
+		
+		/*
+		 * setup google account and authentication to get session object
+		 * */
+<span class="fc" id="L52">		final String username = &quot;cs5123software@gmail.com&quot;;</span>
+<span class="fc" id="L53">		final String password = &quot;itsatestingaccount&quot;;</span>
+<span class="fc" id="L54">		final String hostname = &quot;smtp.gmail.com&quot;;</span>
+<span class="fc" id="L55">		final int smtpport = 587;</span>
+<span class="fc" id="L56">		Properties props = new Properties();</span>
+<span class="fc" id="L57">		props.put(&quot;mail.smtp.auth&quot;, &quot;true&quot;);</span>
+<span class="fc" id="L58">		props.put(&quot;mail.smtp.starttls.enable&quot;, &quot;true&quot;);</span>
+<span class="fc" id="L59">		props.put(&quot;mail.smtp.host&quot;, &quot;smtp.gmail.com&quot;);</span>
+<span class="fc" id="L60">		props.put(&quot;mail.smtp.port&quot;, &quot;587&quot;);</span>
+<span class="fc" id="L61">		googleSession = Session.getInstance(props,</span>
+<span class="fc" id="L62">		  new javax.mail.Authenticator() {</span>
+			protected PasswordAuthentication getPasswordAuthentication() {
+<span class="fc" id="L64">				return new PasswordAuthentication(username, password);</span>
+			}
+		  });
+		
+<span class="fc" id="L68">		email_obj = new SimpleEmail();</span>
+<span class="fc" id="L69">		email_obj.setHostName(hostname);</span>
+<span class="fc" id="L70">		email_obj.setSmtpPort(smtpport);</span>
+
+<span class="fc" id="L72">	}</span>
+
+	
+    /**
+     ********************************************************************************
+     * Method: setCharset()
+     * Purpose: 
+     * Set the charset of the message. Please note that you should set the charset before
+     * adding the message content.
+     * @param newCharset A String.
+     * @throws java.nio.charset.IllegalCharsetNameException if the charset name is invalid
+     * @throws java.nio.charset.UnsupportedCharsetException if no support for the named charset
+     * ********************************************************************************
+     * */
+
+	
+	//@Test(expected=java.nio.charset.IllegalCharsetNameException.class)
+	@Test
+	public void testSetCharset_throwsIllegalCharset() throws EmailException{
+<span class="fc" id="L91">		Exception ex=null;</span>
+<span class="fc" id="L92">		String input = &quot;ascii&quot;;</span>
+<span class="fc" id="L93">		try {email_obj.setCharset(input);}</span>
+<span class="nc" id="L94">		catch(Exception e){ex=e;}</span>
+<span class="fc" id="L95">		assertEquals(null, ex);</span>
+		
+		
+		
+<span class="fc" id="L99">	}</span>
+	@Test(expected=java.nio.charset.UnsupportedCharsetException.class)
+	public void testSetCharset_throwsUnsupportedCharset() throws EmailException{
+<span class="nc" id="L102">		String input = &quot;asciial&quot;;</span>
+<span class="nc" id="L103">		email_obj.setCharset(input);</span>
+		
+		
+		
+<span class="nc" id="L107">	}</span>
+    /**
+     ********************************************************************************
+     * Method: setSmtpPort()
+     * Purpose: 
+	 * Valid TCP Port number for SMTP is between 0 to 65535
+	 * The code seems like only checking anything below 1 without checking zero and 
+	 * the upper limit to 65535
+	 * IllegalArgumentException 
+	 * 
+     * ********************************************************************************
+     * */
+	
+	@Test(expected=IllegalArgumentException.class)
+	 public void testSetSmtpPort()
+	 {
+<span class="fc" id="L123">		int[] input = {-1,1,65570};</span>
+<span class="pc bnc" id="L124" title="All 2 branches missed.">		for (int i :input){</span>
+<span class="nc" id="L125">			email_obj.setSmtpPort(i);</span>
+		}
+		
+		 
+<span class="nc" id="L129">	 }</span>
+	
+    /**
+     ********************************************************************************
+     * Method: sendMimeMessage()
+     * Purpose: 
+	 * Valid TCP Port number for SMTP is between 0 to 65535
+	 * The code seems like only checking anything below 1 without checking zero and 
+	 * the upper limit to 65535
+	 * IllegalArgumentException 
+	 * 
+     * ********************************************************************************
+     * */
+	
+	
+	@Test
+	public void testSendMimeMessage() throws EmailException, AddressException, MessagingException{
+		//email_obj.message=&quot;&quot;;
+
+<span class="nc" id="L148">		email_obj.setMailSession(googleSession);</span>
+<span class="nc" id="L149">		MimeMessage message = new MimeMessage(googleSession);</span>
+<span class="nc" id="L150">		message.setFrom(new InternetAddress(&quot;cs5123software@gmail.com&quot;));</span>
+<span class="nc" id="L151">		message.setRecipients(Message.RecipientType.TO,</span>
+<span class="nc" id="L152">			InternetAddress.parse(&quot;joyrahman@gmail.com&quot;));</span>
+<span class="nc" id="L153">		message.setSubject(&quot;Testing Subject1&quot;);</span>
+<span class="nc" id="L154">		message.setText(&quot;Dear Mail Crawler,&quot;</span>
+			+ &quot;\n\n Your mother calling!&quot;);
+<span class="nc" id="L156">		email_obj.message=message;</span>
+<span class="nc" id="L157">		String result = email_obj.sendMimeMessage();</span>
+<span class="nc" id="L158">		assertTrue(result instanceof String);</span>
+<span class="nc" id="L159">	}</span>
+	
+	//@Test(expected=java.lang.IllegalException.class)
+	/*
+	@Test
+	public void testSendMimeMessage_2() throws EmailException, AddressException, MessagingException{
+		//email_obj.message=&quot;&quot;
+		Exception ex=null;
+		SimpleEmail test_obj = new SimpleEmail();
+		final String username = &quot;cs5123software@gmail.com&quot;;
+		final String password = &quot;itsatestingaccount&quot;;
+		final String hostname = &quot;smtp.gmail.com.vua&quot;;
+		final int smtpport = 587;
+		Properties props = new Properties();
+		props.put(&quot;mail.smtp.auth&quot;, &quot;true&quot;);
+		props.put(&quot;mail.smtp.starttls.enable&quot;, &quot;true&quot;);
+		props.put(&quot;mail.smtp.host&quot;, &quot;smtp.gmail.com.vua&quot;);
+		props.put(&quot;mail.smtp.port&quot;, &quot;587&quot;);
+		test_obj.setHostName(hostname);
+		test_obj.getMailSession();
+		
+		MimeMessage message = new MimeMessage(test_obj.getMailSession());
+		message.setFrom(new InternetAddress(&quot;cs5123software@gmail.com&quot;));
+		message.setRecipients(Message.RecipientType.TO,
+			InternetAddress.parse(&quot;joyrahman@gmail.com&quot;));
+		message.setSubject(&quot;Testing Subject1&quot;);
+		message.setText(&quot;Dear Mail Crawler,&quot;
+			+ &quot;\n\n Your mother calling!&quot;);
+		test_obj.message=message;
+		String result;
+		test_obj.setHostName(&quot;mail.google.com.usa&quot;);
+		//test_obj.message=null;
+		try{
+			result = test_obj.sendMimeMessage();
+		}catch(Exception e){ ex = e;System.out.println(&quot;error&quot;+ex);}
+		assertEquals(null, ex);
+	}
+	*/
+	@Test(expected=EmailException.class)
+	public void testSendMimeMessage_Fail() throws EmailException, AddressException, MessagingException {
+<span class="nc" id="L199">		SimpleEmail temp_obj = new SimpleEmail();</span>
+<span class="nc" id="L200">		temp_obj.setHostName(&quot;mail.com&quot;);</span>
+<span class="nc" id="L201">		Session testSession = temp_obj.getMailSession();</span>
+<span class="nc" id="L202">		MimeMessage message = new MimeMessage(testSession);</span>
+<span class="nc" id="L203">		message.setFrom(new InternetAddress(&quot;cs5123software@gmail.com&quot;));</span>
+<span class="nc" id="L204">		message.setRecipients(Message.RecipientType.TO,</span>
+<span class="nc" id="L205">			InternetAddress.parse(&quot;joyrahman@gmail.com&quot;));</span>
+<span class="nc" id="L206">		message.setSubject(&quot;Testing Subject1&quot;);</span>
+<span class="nc" id="L207">		message.setText(&quot;Dear Mail Crawler,&quot;</span>
+			+ &quot;\n\n Your mother calling!&quot;);
+<span class="nc" id="L209">		temp_obj.message=message;</span>
+<span class="nc" id="L210">		String result = temp_obj.sendMimeMessage();</span>
+<span class="nc" id="L211">		System.out.println(result);</span>
+<span class="nc" id="L212">	}</span>
+	
+    /**
+     ********************************************************************************
+     * Method: setDebug() and setAuthentication
+     * Purpose: 
+	 * Tests the setDebug method
+	 *  
+	 * 
+     * ********************************************************************************
+     * */
+	@Test
+	public void testSetDebug() {
+<span class="fc" id="L225">		email_obj.setDebug(true);</span>
+<span class="fc" id="L226">		assertEquals(true,email_obj.debug);</span>
+<span class="fc" id="L227">	}</span>
+
+	@Test
+	public void testSetAuthentication() {
+<span class="fc" id="L231">		email_obj.setAuthentication(&quot;test&quot;, &quot;test&quot;);</span>
+<span class="fc" id="L232">		assertTrue(email_obj.authenticator instanceof DefaultAuthenticator);</span>
+<span class="fc" id="L233">	}</span>
+
+    /**
+     ********************************************************************************
+     * Method: updateContentType() 
+     * Purpose: 
+	 * Tests the updateContentType
+    * ********************************************************************************
+     * */
+
+
+	@Test
+	public void testUpdateContentType() {
+
+<span class="fc" id="L247">		String[] input = {&quot;text/plain&quot;};</span>
+<span class="fc bfc" id="L248" title="All 2 branches covered.">		for (String i : input)</span>
+		{
+<span class="fc" id="L250">			email_obj.updateContentType(i);</span>
+<span class="fc" id="L251">			assertEquals(i,email_obj.contentType);	</span>
+			
+		}
+		
+<span class="fc" id="L255">	}</span>
+	
+	@Test
+	public void testUpdateConenteType_2(){
+		
+<span class="fc" id="L260">		String input = &quot;meta http-equiv=Content-Type content='text/html';charset='ISO-8859-1'&quot;;</span>
+<span class="fc" id="L261">		email_obj.updateContentType(input);</span>
+		
+<span class="fc" id="L263">	}</span>
+    /**
+     ********************************************************************************
+     * Method: setStartTLSEnabled()
+     * Purpose: 
+	 * Tests the setStartTLS
+    * ********************************************************************************
+     * */
+
+	@Test
+	public void testSetStartTLSEnabled() {
+		
+<span class="fc" id="L275">		assertTrue(email_obj.setStartTLSEnabled(true) instanceof Email);</span>
+<span class="fc" id="L276">	}</span>
+
+
+	@Test
+	public void testSetStartTLSRequired() {
+<span class="fc" id="L281">		assertTrue(email_obj.setStartTLSRequired(true) instanceof Email);</span>
+<span class="fc" id="L282">	}</span>
+
+    /**
+     ********************************************************************************
+     * Method: setMailSession , getMailSession
+     * 
+     * Supply a mail Session object to use. Please note that passing
+     * a user name and password (in the case of mail authentication) will
+     * create a new mail session with a DefaultAuthenticator. This is a
+     * convenience but might come unexpected.
+     *
+     * If mail authentication is used but NO username and password
+     * is supplied the implementation assumes that you have set a
+     * authenticator and will use the existing mail session (as expected).
+     *
+     * @param aSession mail session to be used
+     * @throws IllegalArgumentException if the session is {@code null}
+     * @since 1.0
+     *
+     * ********************************************************************************
+     * */
+	
+	//@Test(expected=IllegalArgumentException.class)
+	@Test
+	public void testSetMailSession() {
+		/*
+		Properties props = new Properties();
+		PasswordAuthentication auth = new PasswordAuthentication(&quot;test_user&quot;, &quot;test_password&quot;);
+		Session session = Session.getDefaultInstance(props);
+		*/
+<span class="fc" id="L312">		Exception ex = null;</span>
+<span class="fc" id="L313">		try{email_obj.setMailSession(googleSession);}</span>
+<span class="nc" id="L314">		catch(Exception e){ex = e;}</span>
+<span class="fc" id="L315">		assertEquals(null, ex);</span>
+		
+		
+		
+<span class="fc" id="L319">	}</span>
+	@Test
+	public void testGetMailSession_1() throws EmailException {
+<span class="fc" id="L322">		assertTrue(email_obj.getMailSession() instanceof Session);</span>
+<span class="fc" id="L323">	}</span>
+	//@Test(expected=EmailException.class)
+	@Test
+	public void testGetMailSession_2() throws EmailException {
+<span class="fc" id="L327">		email_obj.setSSL(true);</span>
+<span class="fc" id="L328">		assertTrue(email_obj.getMailSession() instanceof Session);</span>
+<span class="fc" id="L329">	}</span>
+	
+
+	@Test(expected=IllegalArgumentException.class)
+	public void testSetMailSessionFromJNDI_illegalException() throws Exception {
+		//fail(&quot;Not yet implemented&quot;); // TODO
+<span class="nc" id="L335">		email_obj.setMailSessionFromJNDI(null);</span>
+		
+<span class="nc" id="L337">	}</span>
+	@Test(expected=NamingException.class)
+	public void testSetMailSessionFromJNDI_namingException() throws Exception{
+<span class="nc" id="L340">		email_obj.setMailSessionFromJNDI(&quot;java:localhost&quot;);</span>
+		
+<span class="nc" id="L342">	}</span>
+
+	/**
+	 * Test method for {@link org.apache.commons.mail.Email#setFrom(java.lang.String)}.
+	 * @throws EmailException 
+	 */
+	@Test(expected=EmailException.class)
+	public void testSetFromString() throws EmailException {
+<span class="nc" id="L350">		email_obj.setFrom(&quot;test email&quot;);</span>
+<span class="nc" id="L351">	}</span>
+
+	
+	
+    /**
+     ********************************************************************************
+     * Method: setFrom() , addTo(), addReplyTo, setTo(), addCc(), addBcc()
+     * 
+     * Add a recipient TO to the email using the specified address and the
+     * specified personal name.
+     * The name will be encoded by the charset of
+     * {@link #setCharset(java.lang.String) setCharset()}.
+     * If it is not set, it will be encoded using
+     * the Java platform's default charset (UTF-16) if it contains
+     * non-ASCII characters; otherwise, it is used as is.
+     *
+     * @param email A String.
+     * @param name A String.
+     * @return An Email.
+     * @throws EmailException Indicates an invalid email address.
+     * @param email address, name
+     * @throws EmailException
+     * @since 1.0
+     *
+     * ********************************************************************************
+     * */
+	@Test(expected=EmailException.class)
+	public void testSetFromStringString() throws EmailException {
+<span class="nc" id="L379">		email_obj.setFrom(&quot;test email&quot;, &quot;test name&quot;);</span>
+<span class="nc" id="L380">	}</span>
+
+	
+	@Test(expected=EmailException.class)
+	public void testSetFromStringStringString() throws EmailException {
+<span class="nc" id="L385">		email_obj.setFrom(&quot;test_email&quot;, &quot;test_name&quot;, &quot;UTF-8&quot;);</span>
+<span class="nc" id="L386">	}</span>
+	
+	@Test
+	public void testSetFrom_invalid() throws EmailException{
+		
+<span class="fc" id="L391">		assertTrue(email_obj.setFrom(&quot;joyrahman@gmail.com&quot;,&quot;mynameiskhan20&quot;) instanceof Email);</span>
+		
+<span class="fc" id="L393">	}</span>
+	@Test(expected=UnsupportedCharsetException.class)
+	public void testSetFrom_invalid_2() throws EmailException{
+		
+<span class="nc" id="L397">		assertTrue(email_obj.setFrom(&quot;joyrahman@gmail.com&quot;,&quot;mynameiskhan20&quot;,&quot;baalsaalhobetai&quot;) instanceof Email);</span>
+		
+<span class="nc" id="L399">	}</span>
+	
+	@Test(expected=EmailException.class)
+	public void testAddToString() throws EmailException {
+<span class="nc" id="L403">		email_obj.addTo(&quot;test email&quot;);</span>
+<span class="nc" id="L404">	}</span>
+
+	@Test(expected=EmailException.class)
+	public void testAddToStringArray() throws EmailException {
+<span class="nc" id="L408">		String[] input = {};</span>
+<span class="nc" id="L409">		email_obj.addTo(input);</span>
+<span class="nc" id="L410">	}</span>
+
+	
+	@Test(expected=EmailException.class)
+	public void testAddToStringString() throws EmailException {
+<span class="nc" id="L415">		email_obj.addTo(&quot;test&quot;,&quot;test&quot;);</span>
+<span class="nc" id="L416">	}</span>
+	@Test
+	public void testAddToStringString_correct() throws EmailException {
+<span class="fc" id="L419">		String[] input_emails = {&quot;joyrahman@gmail.com&quot;,&quot;test@test.com&quot;};</span>
+<span class="fc" id="L420">		assertTrue(email_obj.addTo(&quot;joyrahman@gmail.com&quot;) instanceof Email);</span>
+<span class="fc" id="L421">		assertTrue(email_obj.addTo(input_emails) instanceof Email);</span>
+<span class="fc" id="L422">		assertTrue(email_obj.addTo(&quot;joyrahman@gmail.com&quot;,&quot;Joy Rahman&quot;) instanceof Email);</span>
+<span class="fc" id="L423">		assertTrue(email_obj.addTo(&quot;joyrahman@gmail.com&quot;,&quot;Joy Rahman&quot;) instanceof Email);</span>
+<span class="fc" id="L424">		assertTrue(email_obj.addTo(&quot;joyrahman@gmail.com&quot;,&quot;Joy Rahman&quot;, &quot;UTF-8&quot;) instanceof Email);</span>
+<span class="fc" id="L425">	}</span>
+
+	/**
+	 * Test method for {@link org.apache.commons.mail.Email#addTo(java.lang.String, java.lang.String, java.lang.String)}.
+	 * @throws EmailException 
+	 */
+	@Test(expected=EmailException.class)
+	public void testAddToStringStringString() throws EmailException {
+<span class="nc" id="L433">		email_obj.addTo(&quot;test&quot;,&quot;test&quot;,&quot;UTF-8&quot;);</span>
+<span class="nc" id="L434">	}</span>
+	
+	@Test
+	public void testAddReplyToString_correct() throws EmailException {
+<span class="fc" id="L438">	String[] input_emails = {&quot;joyrahman@gmail.com&quot;,&quot;test@test.com&quot;};</span>
+<span class="fc" id="L439">	assertTrue(email_obj.addReplyTo(&quot;joyrahman@gmail.com&quot;) instanceof Email);</span>
+	//assertTrue(email_obj.addReplyTo(input_emails) instanceof Email);
+<span class="fc" id="L441">	assertTrue(email_obj.addReplyTo(&quot;joyrahman@gmail.com&quot;,&quot;Joy Rahman&quot;) instanceof Email);</span>
+<span class="fc" id="L442">	assertTrue(email_obj.addReplyTo(&quot;joyrahman@gmail.com&quot;,&quot;Joy Rahman&quot;) instanceof Email);</span>
+<span class="fc" id="L443">	assertTrue(email_obj.addReplyTo(&quot;joyrahman@gmail.com&quot;,&quot;Joy Rahman&quot;, &quot;UTF-8&quot;) instanceof Email);</span>
+
+<span class="fc" id="L445">	}</span>
+
+	@Test(expected=EmailException.class)
+	public void testSetTo() throws EmailException {
+<span class="nc" id="L449">		email_obj.setTo(null);</span>
+<span class="nc" id="L450">	}</span>
+
+	@Test(expected=EmailException.class)
+	public void testAddCcString() throws EmailException{
+<span class="nc" id="L454">		email_obj.addCc(&quot;test&quot;);</span>
+<span class="nc" id="L455">	}</span>
+	
+	
+
+	@Test(expected=EmailException.class)
+	public void testAddCcStringArray() throws EmailException{
+<span class="nc" id="L461">		String input[] = {};</span>
+<span class="nc" id="L462">		email_obj.addCc(input);</span>
+<span class="nc" id="L463">	}</span>
+
+	
+	@Test(expected=EmailException.class)
+	public void testAddCcStringString() throws EmailException{
+<span class="nc" id="L468">		email_obj.addCc(&quot;test_email&quot;,&quot;test_name&quot;);</span>
+<span class="nc" id="L469">	}</span>
+
+
+	@Test(expected=EmailException.class)
+	public void testAddCcStringStringString() throws EmailException {
+<span class="nc" id="L474">			email_obj.addCc(&quot;test_email&quot;,&quot;test_name&quot;,&quot;UTF-16&quot;);</span>
+<span class="nc" id="L475">	}</span>
+	
+	@Test
+	public void testAddCcStringString_correct() throws EmailException {
+<span class="fc" id="L479">		String[] input_emails = {&quot;joyrahman@gmail.com&quot;,&quot;test@test.com&quot;};</span>
+<span class="fc" id="L480">		assertTrue(email_obj.addCc(&quot;joyrahman@gmail.com&quot;) instanceof Email);</span>
+<span class="fc" id="L481">		assertTrue(email_obj.addCc(input_emails) instanceof Email);</span>
+<span class="fc" id="L482">		assertTrue(email_obj.addCc(&quot;joyrahman@gmail.com&quot;,&quot;Joy Rahman&quot;) instanceof Email);</span>
+<span class="fc" id="L483">		assertTrue(email_obj.addCc(&quot;joyrahman@gmail.com&quot;,&quot;Joy Rahman&quot;) instanceof Email);</span>
+<span class="fc" id="L484">		assertTrue(email_obj.addCc(&quot;joyrahman@gmail.com&quot;,&quot;Joy Rahman&quot;, &quot;UTF-8&quot;) instanceof Email);</span>
+<span class="fc" id="L485">	}</span>
+	
+
+	@Test(expected=EmailException.class)
+	public void testSetCc() throws EmailException {
+<span class="nc" id="L490">		email_obj.setCc(null);</span>
+<span class="nc" id="L491">	}</span>
+
+
+
+	@Test(expected=EmailException.class)
+	public void testAddBccStringArray() throws EmailException{
+<span class="nc" id="L497">		String input[] = {};</span>
+<span class="nc" id="L498">		email_obj.addBcc(input);</span>
+<span class="nc" id="L499">	}</span>
+
+	
+	@Test
+	public void testAddBccStringString_correct() throws EmailException {
+<span class="fc" id="L504">		String[] input_emails = {&quot;joyrahman@gmail.com&quot;,&quot;test@test.com&quot;};</span>
+<span class="fc" id="L505">		assertTrue(email_obj.addBcc(&quot;joyrahman@gmail.com&quot;) instanceof Email);</span>
+<span class="fc" id="L506">		assertTrue(email_obj.addBcc(input_emails) instanceof Email);</span>
+<span class="fc" id="L507">		assertTrue(email_obj.addBcc(&quot;joyrahman@gmail.com&quot;,&quot;Joy Rahman&quot;) instanceof Email);</span>
+<span class="fc" id="L508">		assertTrue(email_obj.addBcc(&quot;joyrahman@gmail.com&quot;,&quot;Joy Rahman&quot;) instanceof Email);</span>
+<span class="fc" id="L509">		assertTrue(email_obj.addBcc(&quot;joyrahman@gmail.com&quot;,&quot;Joy Rahman&quot;, &quot;UTF-8&quot;) instanceof Email);</span>
+<span class="fc" id="L510">}</span>
+	
+
+	@Test(expected=EmailException.class)
+	public void testSetBcc_invalid() throws EmailException {
+<span class="nc" id="L515">		email_obj.setBcc(null);</span>
+<span class="nc" id="L516">	}</span>
+	@Test(expected=EmailException.class)
+	public void testSetCc_invalid() throws EmailException {
+<span class="nc" id="L519">		email_obj.setCc(null);</span>
+<span class="nc" id="L520">	}</span>
+	@Test(expected=EmailException.class)
+	public void testSetTo_invalid() throws EmailException {
+<span class="nc" id="L523">		email_obj.setTo(null);</span>
+<span class="nc" id="L524">	}</span>
+	@Test
+	public void testSetBcc_valid() throws EmailException, UnsupportedEncodingException {
+<span class="fc" id="L527">		ArrayList&lt;InternetAddress&gt; aList = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L528">		InternetAddress a = new InternetAddress(&quot;test@com&quot;, &quot;test&quot;);</span>
+<span class="fc" id="L529">		InternetAddress b = new InternetAddress(&quot;test1@com&quot;, &quot;test1&quot;);</span>
+<span class="fc" id="L530">		aList.add(a);</span>
+<span class="fc" id="L531">		aList.add(b);</span>
+<span class="fc" id="L532">		assertTrue(email_obj.setBcc(aList) instanceof Email);</span>
+
+
+<span class="fc" id="L535">	}</span>
+	@Test
+	public void testSetTo_valid() throws EmailException, UnsupportedEncodingException {
+<span class="fc" id="L538">		ArrayList&lt;InternetAddress&gt; aList = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L539">		InternetAddress a = new InternetAddress(&quot;test@com&quot;, &quot;test&quot;);</span>
+<span class="fc" id="L540">		InternetAddress b = new InternetAddress(&quot;test1@com&quot;, &quot;test1&quot;);</span>
+<span class="fc" id="L541">		aList.add(a);</span>
+<span class="fc" id="L542">		aList.add(b);</span>
+<span class="fc" id="L543">		assertTrue(email_obj.setTo(aList) instanceof Email);</span>
+<span class="fc" id="L544">		}</span>
+	@Test
+	public void testSetCc_valid() throws EmailException, UnsupportedEncodingException {
+<span class="fc" id="L547">		ArrayList&lt;InternetAddress&gt; aList = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L548">		InternetAddress a = new InternetAddress(&quot;test@com&quot;, &quot;test&quot;);</span>
+<span class="fc" id="L549">		InternetAddress b = new InternetAddress(&quot;test1@com&quot;, &quot;test1&quot;);</span>
+<span class="fc" id="L550">		aList.add(a);</span>
+<span class="fc" id="L551">		aList.add(b);</span>
+<span class="fc" id="L552">		assertTrue(email_obj.setCc(aList) instanceof Email);</span>
+<span class="fc" id="L553">		}</span>
+	
+
+	@Test(expected=EmailException.class)
+	public void testAddReplyToString() throws EmailException {
+<span class="nc" id="L558">		email_obj.addReplyTo(&quot;test&quot;);</span>
+<span class="nc" id="L559">	}</span>
+	@Test(expected=EmailException.class)
+	public void testAddReplyToStringString() throws EmailException{
+<span class="nc" id="L562">		email_obj.addBcc(&quot;test_email&quot;,&quot;test_name&quot;);</span>
+<span class="nc" id="L563">	}</span>
+	@Test(expected=EmailException.class)
+	public void testAddReplyToStringStringString() throws EmailException{
+<span class="nc" id="L566">		email_obj.addBcc(&quot;test_email&quot;,&quot;test_name&quot;,&quot;UTF-8&quot;);</span>
+<span class="nc" id="L567">	}</span>
+
+
+
+	@Test(expected=EmailException.class)
+	public void testSetReplyTo() throws EmailException {
+<span class="nc" id="L573">		email_obj.setReplyTo(null);</span>
+<span class="nc" id="L574">	}</span>
+
+	/************************************************
+	 * Test method for setHeaders(), addHeaders().
+	 * Used to specify the mail headers.  Example:
+     *
+     * X-Mailer: Sendmail, X-Priority: 1( highest )
+     * or  2( high ) 3( normal ) 4( low ) and 5( lowest )
+     * Disposition-Notification-To: user@domain.net
+     *
+     * @param map A Map.
+     * @throws IllegalArgumentException if either of the 
+     * provided header / value is null or empty
+	 *****************************************************/
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void testSetHeaders() {
+<span class="nc" id="L591">		Map&lt;String, String&gt; input = new HashMap&lt;String, String&gt;();</span>
+<span class="nc" id="L592">		input.put(&quot;test1&quot;,&quot;test1&quot;);</span>
+<span class="nc" id="L593">		input.put(&quot;test2&quot;,&quot;test2&quot;);</span>
+		
+<span class="nc" id="L595">		email_obj.setHeaders(input);</span>
+<span class="nc" id="L596">	}</span>
+
+
+	@Test(expected=IllegalArgumentException.class)
+	public void testAddHeader_name() {
+<span class="nc" id="L601">		email_obj.addHeader(&quot;test&quot;, &quot;test12345678&quot;);</span>
+<span class="nc" id="L602">	}</span>
+	@Test(expected=IllegalArgumentException.class)
+	public void testAddHeader_value() {
+<span class="nc" id="L605">		Exception ex = null;</span>
+<span class="nc" id="L606">		email_obj.addHeader(&quot;test123456789&quot;, &quot;test&quot;);</span>
+<span class="nc" id="L607">	}</span>
+	
+	
+	@Test
+	public void testAddHeader_pass(){
+<span class="fc" id="L612">		Exception ex = null;</span>
+		try{
+<span class="fc" id="L614">			email_obj.addHeader(&quot;testisnotdoinggood&quot;, &quot;test_valisnotdoinggood&quot;);</span>
+<span class="fc" id="L615">		}</span>
+<span class="nc" id="L616">		catch (Exception e)</span>
+		{
+<span class="nc" id="L618">			ex =e; </span>
+		}
+<span class="fc" id="L620">		assertEquals(null, ex);</span>
+		
+		
+<span class="fc" id="L623">	}</span>
+
+	/**
+	 * Test method for setSubject(java.lang.String)}.
+    * Set the email subject.
+    *
+    * @param aSubject A String.
+    * @return An Email.
+    * @since 1.0
+	*/
+	
+	@Test
+	public void testSetSubject() {
+
+<span class="fc" id="L637">		Email test = email_obj.setSubject(&quot;test@gmail.com&quot;);</span>
+<span class="fc" id="L638">		assertTrue(test instanceof Email );</span>
+		//asserttEqual(Email.class, test.getClass());
+<span class="fc" id="L640">	}</span>
+
+	/**
+	 * Test method for {@link org.apache.commons.mail.Email#setBounceAddress(java.lang.String)}.
+	 * Set the &quot;bounce address&quot; - the address to which undeliverable messages
+     * will be returned.  If this value is never set, then the message will be
+     * sent to the address specified with the System property &quot;mail.smtp.from&quot;,
+     * or if that value is not set, then to the &quot;from&quot; address.
+     *
+     * @param email A String.
+     * @return An Email.
+     * @throws IllegalStateException when the mail session is already initialized
+     * @since 1.0
+	 */
+	@Test
+	public void testSetBounceAddress() {
+<span class="fc" id="L656">		Email test = email_obj.setBounceAddress(&quot;test&quot;);</span>
+<span class="fc" id="L657">		assertTrue(test instanceof Email );</span>
+<span class="fc" id="L658">	}</span>
+
+
+    /**
+     * Test Method to very BuildMimeMessage
+     * Does the work of actually building the MimeMessage. 
+     *
+     * @throws IllegalStateException if the MimeMessage was already built
+     * @throws EmailException if there was an error.
+
+     */
+	
+	@Test
+	public void testBuildMimeMessage_1() throws EmailException {
+<span class="fc" id="L672">		Exception ex = null;</span>
+<span class="fc" id="L673">		email_obj.setMailSession(googleSession);</span>
+<span class="fc" id="L674">		email_obj.setSubject(&quot;its a very long string to pass&quot;);</span>
+<span class="fc" id="L675">		email_obj.setCharset(&quot;ISO-8859-1&quot;);</span>
+		//email_obj.setContent(new MimeMultipart());
+<span class="fc" id="L677">		email_obj.setContent(&quot;Mail content&quot;, &quot;text/plain&quot;);</span>
+<span class="fc" id="L678">		email_obj.setFrom(&quot;test@gmail.com&quot;);</span>
+		
+<span class="fc" id="L680">		Map&lt;String, String&gt; input = new HashMap&lt;String, String&gt;();</span>
+<span class="fc" id="L681">		input.put(&quot;test12345678&quot;,&quot;test12345678&quot;);</span>
+<span class="fc" id="L682">		email_obj.addTo(&quot;a@a.com&quot;);</span>
+<span class="fc" id="L683">		email_obj.addTo(&quot;b@b.com&quot;);</span>
+<span class="fc" id="L684">		email_obj.addCc(&quot;c@c.com&quot;);</span>
+<span class="fc" id="L685">		email_obj.addBcc(&quot;d@d.com&quot;);</span>
+<span class="fc" id="L686">		email_obj.addReplyTo(&quot;e@e.com&quot;);</span>
+<span class="fc" id="L687">		email_obj.setHeaders(input);</span>
+		try{
+<span class="fc" id="L689">		email_obj.buildMimeMessage();</span>
+<span class="pc" id="L690">		} catch (Exception e) {</span>
+<span class="nc" id="L691">			ex =e ;</span>
+		}
+<span class="fc" id="L693">		assertEquals(ex,null);</span>
+		
+<span class="fc" id="L695">	}</span>
+	@Test
+	public void testBuildMimeMessage_2() throws EmailException {
+<span class="fc" id="L698">		Exception ex = null;</span>
+<span class="fc" id="L699">		email_obj.setMailSession(googleSession);</span>
+<span class="fc" id="L700">		email_obj.setSubject(&quot;its a very long string to pass&quot;);</span>
+<span class="fc" id="L701">		email_obj.setCharset(&quot;ISO-8859-1&quot;);</span>
+		//email_obj.setContent(new MimeMultipart());
+		//email_obj.setContent(&quot;Mail content&quot;, &quot;text/plain&quot;);
+<span class="fc" id="L704">		email_obj.setFrom(&quot;test@gmail.com&quot;);</span>
+<span class="fc" id="L705">		email_obj.setContent(new MimeMultipart(&quot;test.com&quot;));</span>
+		
+<span class="fc" id="L707">		Map&lt;String, String&gt; input = new HashMap&lt;String, String&gt;();</span>
+<span class="fc" id="L708">		input.put(&quot;test12345678&quot;,&quot;test12345678&quot;);</span>
+<span class="fc" id="L709">		email_obj.addTo(&quot;a@a.com&quot;);</span>
+<span class="fc" id="L710">		email_obj.addTo(&quot;b@b.com&quot;);</span>
+<span class="fc" id="L711">		email_obj.setHeaders(input);</span>
+		try{
+<span class="fc" id="L713">		email_obj.buildMimeMessage();</span>
+<span class="pc" id="L714">		} catch (Exception e) {</span>
+<span class="nc" id="L715">			ex =e ;</span>
+		}
+<span class="fc" id="L717">		assertEquals(ex,null);</span>
+		
+<span class="fc" id="L719">	}</span>
+	@Test 
+	public void testSend() throws EmailException{
+<span class="fc" id="L722">		Exception ex = null;</span>
+<span class="fc" id="L723">		SimpleEmail email2_obj = new SimpleEmail();</span>
+<span class="fc" id="L724">		email2_obj.setMailSession(googleSession);</span>
+<span class="fc" id="L725">		email2_obj.setSubject(&quot;its a very long string to pass&quot;);</span>
+<span class="fc" id="L726">		email2_obj.setCharset(&quot;ISO-8859-1&quot;);</span>
+		//email_obj.setContent(new MimeMultipart());
+<span class="fc" id="L728">		email2_obj.setContent(&quot;Mail content&quot;, &quot;text/plain&quot;);</span>
+<span class="fc" id="L729">		email2_obj.setFrom(&quot;cs5123software@gmail.com&quot;);</span>
+		
+<span class="fc" id="L731">		Map&lt;String, String&gt; input = new HashMap&lt;String, String&gt;();</span>
+<span class="fc" id="L732">		input.put(&quot;test12345678&quot;,&quot;test12345678&quot;);</span>
+<span class="fc" id="L733">		email2_obj.addTo(&quot;joyrahman@gmail.com&quot;);</span>
+		//email2_obj.addTo(&quot;b@b.com&quot;);
+		//email2_obj.addCc(&quot;c@c.com&quot;);
+		//email2_obj.addBcc(&quot;d@d.com&quot;);
+<span class="fc" id="L737">		email2_obj.addReplyTo(&quot;cs5123software@gmail.com&quot;);</span>
+<span class="fc" id="L738">		email2_obj.setHeaders(input);</span>
+<span class="fc" id="L739">		email2_obj.message = null;</span>
+<span class="fc" id="L740">		String output = null;</span>
+		try{
+			//email2_obj.buildMimeMessage();
+<span class="nc" id="L743">			output = email2_obj.send();</span>
+			//System.out.println(&quot;output:&quot;+ output);
+<span class="nc" id="L745">			}</span>
+<span class="fc" id="L746">		catch(Exception e){ex = e; System.out.println(&quot;error&gt;&gt;&quot;+e);}</span>
+<span class="nc" id="L747">		assertEquals(ex, null);</span>
+		
+<span class="nc" id="L749">	}</span>
+
+
+
+	/**
+	 * Test method for {@link org.apache.commons.mail.Email#getMimeMessage()}.
+	 *     /**
+     * Returns the internal MimeMessage. Please not that the
+     * MimeMessage is build by the buildMimeMessage() method.
+     *
+     * @return the MimeMessage
+	 * @throws EmailException 
+     *
+	 */
+	@Test
+	public void testGetMimeMessage() throws EmailException {
+<span class="fc" id="L765">		Exception ex = null;</span>
+<span class="fc" id="L766">		email_obj.createMimeMessage(googleSession);</span>
+		//MimeMessage test = email_obj.getMimeMessage();
+<span class="fc" id="L768">		try{email_obj.getMimeMessage();}</span>
+<span class="nc" id="L769">		catch(Exception e) {ex=e;}</span>
+<span class="fc" id="L770">		assertEquals(null, ex);</span>
+		//assertTrue( email_obj.getMimeMessage() instanceof MimeMessage);
+<span class="fc" id="L772">	}</span>
+
+	/** Test method for setSentDate
+     * Expected : Sets the sent date for the email. The sent date will default to the
+     * current date if not explicitly set.
+     *
+     * @param date Date to use as the sent date on the email
+     */
+	
+	@Test 
+	public void testSetSentDate(){
+<span class="fc" id="L783">		email_obj.setSentDate(null);</span>
+<span class="fc" id="L784">		assertTrue(email_obj.getSentDate() instanceof Date);</span>
+<span class="fc" id="L785">		Date temp_date = new java.util.Date();</span>
+<span class="fc" id="L786">		email_obj.setSentDate(temp_date);</span>
+<span class="fc" id="L787">		assertTrue(email_obj.getSentDate() instanceof Date);</span>
+<span class="fc" id="L788">	}</span>
+
+	/**
+	* Test method for {@link org.apache.commons.mail.Email#getSentDate()}.
+    * Gets the sent date for the email.
+    *
+    * @return date to be used as the sent date for the email
+    * @since 1.0
+	*/
+	@Test
+	public void testGetSentDate() {
+<span class="fc" id="L799">		Date test = email_obj.getSentDate();</span>
+<span class="fc" id="L800">		assertTrue(test instanceof Date);</span>
+<span class="fc" id="L801">	}</span>
+
+	/* Test method for getHostName()
+	 * Gets the host name of the SMTP server,
+     *
+     * @return host name
+     */
+
+	@Test
+	public void testGetHostName_invalid() {
+		//email_obj.setMailSession(googleSession);
+		//String input = &quot;smtp.gmail.com&quot;;
+<span class="fc" id="L813">		String input = null;</span>
+<span class="fc" id="L814">		SimpleEmail temp_obj = new SimpleEmail();</span>
+		//temp_obj.hostName=input;
+<span class="fc" id="L816">		String result = temp_obj.getHostName();</span>
+<span class="fc" id="L817">		assertEquals(result, input);</span>
+		
+<span class="fc" id="L819">	}</span>
+	@Test
+	public void testGetHostName_invalid_host() {
+		//email_obj.setMailSession(googleSession);
+<span class="nc" id="L823">		String input = &quot;smtp.gmail.com.temp&quot;;</span>
+		//String input = null;
+<span class="nc" id="L825">		SimpleEmail temp_obj = new SimpleEmail();</span>
+<span class="nc" id="L826">		temp_obj.hostName=input;</span>
+<span class="nc" id="L827">		String result = temp_obj.getHostName();</span>
+<span class="nc" id="L828">		assertEquals(result, input);</span>
+		
+<span class="nc" id="L830">	}</span>
+	@Test
+	public void testGetHostName_valid() {
+<span class="fc" id="L833">		email_obj.setMailSession(googleSession);</span>
+<span class="fc" id="L834">		String input = &quot;smtp.gmail.com&quot;;</span>
+		//String input = &quot;localhost&quot;;
+		//email_obj.hostName=input;
+<span class="fc" id="L837">		String result = email_obj.getHostName();</span>
+<span class="fc" id="L838">		assertEquals(result, input);</span>
+		
+<span class="fc" id="L840">	}</span>
+
+	/**
+	 * Test method for getSmtpPort()}.
+	 */
+	@Test
+	public void testGetSmtpPort_valid() {
+<span class="fc" id="L847">		email_obj.setMailSession(googleSession);</span>
+<span class="fc" id="L848">		String input = &quot;587&quot;;</span>
+		//String input = &quot;localhost&quot;;
+		//email_obj.hostName=input;
+<span class="fc" id="L851">		String result = email_obj.getSmtpPort();</span>
+<span class="fc" id="L852">		assertEquals(result, input);</span>
+		//String result = email_obj.getSmtpPort();
+		//assertTrue(result instanceof String);
+<span class="fc" id="L855">	}</span>
+	@Test
+	public void testGetSmtpPort_invalid() {
+		//email_obj.setMailSession(googleSession);
+<span class="nc" id="L859">		int input = 65514;</span>
+		//String input = null;
+<span class="nc" id="L861">		SimpleEmail temp_obj = new SimpleEmail();</span>
+<span class="nc" id="L862">		temp_obj.setSmtpPort(input);</span>
+<span class="nc" id="L863">		String result = temp_obj.getSmtpPort();</span>
+<span class="nc" id="L864">		assertEquals(result, Integer.toString(input));</span>
+		
+<span class="nc" id="L866">	}</span>
+
+	/**
+	* Test method for getSslSmtpPort()}.
+    * Returns the current SSL port used by the SMTP transport.
+    *
+    * @return the current SSL port used by the SMTP transport
+	 */
+	@Test
+	public void testGetSslSmtpPort_valid() {
+<span class="nc" id="L876">		email_obj.setMailSession(googleSession);</span>
+<span class="nc" id="L877">		String input = &quot;587&quot;;</span>
+		//String input = &quot;localhost&quot;;
+		//email_obj.hostName=input;
+<span class="nc" id="L880">		String result = email_obj.getSslSmtpPort();</span>
+<span class="nc" id="L881">		assertEquals(result, input);</span>
+		//String result = email_obj.getSmtpPort();
+		//assertTrue(result instanceof String);
+<span class="nc" id="L884">	}</span>
+	@Test
+	public void testGetSslSmtpPort_invalid() {
+		//email_obj.setMailSession(googleSession);
+<span class="nc" id="L888">		int input = 65514;</span>
+		//String input = null;
+<span class="nc" id="L890">		SimpleEmail temp_obj = new SimpleEmail();</span>
+<span class="nc" id="L891">		temp_obj.setSmtpPort(input);</span>
+<span class="nc" id="L892">		String result = temp_obj.getSslSmtpPort();</span>
+<span class="nc" id="L893">		assertEquals(result, Integer.toString(input));</span>
+		
+<span class="nc" id="L895">	}</span>
+	
+	
+	/**
+	 * Test method for {@link org.apache.commons.mail.Email#createMimeMessage(javax.mail.Session)}.
+	 *
+     * Factory method to create a customized MimeMessage which can be
+     * implemented by a derived class, e.g. to set the message id.
+     *
+     * @param aSession mail session to be used
+     * @return the newly created message
+	 */
+	@Test
+	public void testCreateMimeMessage() {
+		//Session aSession = new Session(null, null);
+<span class="fc" id="L910">		MimeMessage output = email_obj.createMimeMessage(null);</span>
+<span class="fc" id="L911">		assertTrue(output instanceof MimeMessage);</span>
+		
+<span class="fc" id="L913">	}</span>
+	/*Test method to verify return types of getToAddres,getBCCAddress,getCcAddress */
+	@Test
+	public void testGetAddresses(){
+<span class="fc" id="L917">		assertTrue(email_obj.getToAddresses() instanceof List&lt;?&gt;);</span>
+<span class="fc" id="L918">		assertTrue(email_obj.getBccAddresses() instanceof List&lt;?&gt;);</span>
+<span class="fc" id="L919">		assertTrue(email_obj.getCcAddresses() instanceof List&lt;?&gt;);</span>
+<span class="fc" id="L920">		assertTrue(email_obj.getReplyToAddresses() instanceof List&lt;?&gt;);</span>
+		//assertTrue(email_obj.getFromAddress() instanceof InternetAddress);
+<span class="fc" id="L922">	}</span>
+	
+	@Test
+	public void testGetFromAddress() throws EmailException{
+<span class="fc" id="L926">		String expected = &quot;test@gmail.com&quot;;</span>
+<span class="fc" id="L927">		email_obj.setFrom(expected);</span>
+<span class="fc" id="L928">		InternetAddress result = email_obj.getFromAddress();</span>
+<span class="fc" id="L929">		assertTrue(result instanceof InternetAddress);</span>
+		
+		
+<span class="fc" id="L932">	}</span>
+	@Test
+	public void testGetSubject() throws EmailException{
+<span class="fc" id="L935">		String expected = &quot;this is a test&quot;;</span>
+<span class="fc" id="L936">		email_obj.setSubject(expected);</span>
+<span class="fc" id="L937">		String result = email_obj.getSubject();</span>
+<span class="fc" id="L938">		assertEquals(result,expected);</span>
+		
+		
+<span class="fc" id="L941">	}</span>
+	/* Test method to verify various get/set methods*/
+
+	@Test
+	public void testGetSocketTimeout2(){
+<span class="fc" id="L946">		assertEquals(email_obj.getSocketTimeout(),EmailConstants.SOCKET_TIMEOUT_MS);</span>
+
+<span class="fc" id="L948">	}</span>
+	@Test 
+	public void testSetSSL(){
+<span class="fc" id="L951">		email_obj.setSSL(true);</span>
+<span class="fc" id="L952">		assertTrue(email_obj.isSSL());</span>
+<span class="fc" id="L953">	}</span>
+	
+	@Test 
+	public void testSetTLS(){
+<span class="fc" id="L957">		email_obj.setTLS(true);</span>
+<span class="fc" id="L958">		assertTrue(email_obj.isTLS());</span>
+<span class="fc" id="L959">	}</span>
+	@Test
+	public void testGetSocketConnectionTimeout(){
+<span class="fc" id="L962">		assertEquals(email_obj.getSocketConnectionTimeout(),EmailConstants.SOCKET_TIMEOUT_MS);</span>
+
+		
+
+<span class="fc" id="L966">	}</span>
+
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.2.201409121644</span>EmailUtilsTest (May 2, 2015 9:11:25 PM)</div></body></html>

@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../.resources/report.gif" type="image/gif"/><title>EmailUtilsTest.java</title><link rel="stylesheet" href="../../../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../.sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">EmailUtilsTest (May 2, 2015 9:11:25 PM)</a> &gt; <a href="../../index.html" class="el_group">Email</a> &gt; <a href="../index.html" class="el_bundle">Email</a> &gt; <a href="index.source.html" class="el_package">org.apache.commons.mail</a> &gt; <span class="el_source">EmailUtilsTest.java</span></div><h1>EmailUtilsTest.java</h1><pre class="source lang-java linenums"><span class="fc" id="L1">package org.apache.commons.mail;</span>
+
+import static org.junit.Assert.*;
+
+import java.io.IOException;
+import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Properties;
+
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.internet.MimeMessage;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+
+import org.junit.Before;
+import org.junit.Test;
+
+<span class="fc" id="L22">public class EmailUtilsTest {</span>
+	Session googleSession;
+	@Before
+	public void create(){
+		//EmailUtils email;
+		//System.out.println(&quot;Running the test&quot;);
+<span class="fc" id="L28">		final String username = &quot;cs5123software@gmail.com&quot;;</span>
+<span class="fc" id="L29">		final String password = &quot;itsatestingaccount&quot;;</span>
+<span class="fc" id="L30">		final String hostname = &quot;smtp.gmail.com&quot;;</span>
+<span class="fc" id="L31">		final int smtpport = 587;</span>
+<span class="fc" id="L32">		Properties props = new Properties();</span>
+<span class="fc" id="L33">		props.put(&quot;mail.smtp.auth&quot;, &quot;true&quot;);</span>
+<span class="fc" id="L34">		props.put(&quot;mail.smtp.starttls.enable&quot;, &quot;true&quot;);</span>
+<span class="fc" id="L35">		props.put(&quot;mail.smtp.host&quot;, &quot;smtp.gmail.com&quot;);</span>
+<span class="fc" id="L36">		props.put(&quot;mail.smtp.port&quot;, &quot;587&quot;);</span>
+<span class="fc" id="L37">		googleSession = Session.getInstance(props,</span>
+<span class="fc" id="L38">		  new javax.mail.Authenticator() {</span>
+			protected PasswordAuthentication getPasswordAuthentication() {
+<span class="nc" id="L40">				return new PasswordAuthentication(username, password);</span>
+			}
+		  });
+<span class="fc" id="L43">	}</span>
+	@Test
+	public void testIsEmpty() {
+<span class="fc" id="L46">		boolean expected = true;</span>
+<span class="fc" id="L47">		boolean result = true;</span>
+<span class="fc" id="L48">		String[] input = {&quot;abcdefghijklmnop&quot;,&quot;test&quot;,&quot;&quot;};</span>
+<span class="pc bnc" id="L49" title="All 2 branches missed.">		for (String i : input)</span>
+		{
+<span class="nc" id="L51">			result = EmailUtils.isEmpty(i);</span>
+<span class="nc" id="L52">			assertEquals(result,expected);	</span>
+			
+		}
+		//fail(&quot;Not yet implemented&quot;);
+		//assertEquals(result,expected);
+<span class="nc" id="L57">	}</span>
+
+	@Test
+	public void testIsNotEmpty() {
+<span class="fc" id="L61">		boolean expected = true;</span>
+<span class="fc" id="L62">		boolean result = true;</span>
+<span class="fc" id="L63">		String[] input = {&quot;abcdefghijklmnopqrst&quot;,&quot;test&quot;,&quot;&quot;};</span>
+<span class="pc bpc" id="L64" title="1 of 2 branches missed.">		for (String i : input)</span>
+		{
+<span class="fc" id="L66">			result = EmailUtils.isNotEmpty(i);</span>
+<span class="fc" id="L67">			assertEquals(result,expected);	</span>
+			/*
+			if (result==false){
+				break;
+			}
+			*/
+		}
+		//assertEquals(result,expected);	
+
+		//boolean result = EmailUtils.isNotEmpty(input[]);
+		//assertEquals(result, expected);
+<span class="nc" id="L78">	}</span>
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void testNotNull() {
+<span class="nc" id="L82">		Object dummy = null;</span>
+<span class="nc" id="L83">		EmailUtils.notNull(dummy,&quot;Error&quot;);</span>
+<span class="nc" id="L84">	}</span>
+
+	@Test
+	public void testRandomAlphabetic() {
+<span class="fc" id="L88">		int input = 10;</span>
+		//String output = EmailUtils.randomAlphabetic(input);
+<span class="fc" id="L90">		assertTrue(EmailUtils.randomAlphabetic(input) instanceof String);</span>
+<span class="fc" id="L91">	}</span>
+
+	 /**
+     * Encodes an input string according to RFC 2392. Unsafe characters are escaped.
+     *
+     * @param input the input string to be URL encoded
+     * @return a URL encoded string
+     * @throws UnsupportedEncodingException if &quot;US-ASCII&quot; charset is not available
+     * @see &lt;a href=&quot;http://tools.ietf.org/html/rfc2392&quot;&gt;RFC 2392&lt;/a&gt;
+     */
+	
+	@Test
+	public void testEncodeUrl_string() throws UnsupportedEncodingException {
+<span class="fc" id="L104">		String input = &quot;test&quot;;</span>
+<span class="fc" id="L105">		String expected = &quot;test&quot;;		</span>
+<span class="fc" id="L106">		String result = EmailUtils.encodeUrl(input);</span>
+		//System.out.println(result);
+<span class="fc" id="L108">		assertEquals(result, expected);</span>
+		//fail(&quot;Not yet implemented&quot;);
+<span class="fc" id="L110">	}</span>
+	@Test
+	public void testEncodeUrl_string_empty() throws UnsupportedEncodingException {
+<span class="fc" id="L113">		String input = null;</span>
+<span class="fc" id="L114">		String expected = null;		</span>
+<span class="fc" id="L115">		String result = EmailUtils.encodeUrl(input);</span>
+		//System.out.println(result);
+<span class="fc" id="L117">		assertEquals(result, expected);</span>
+		//fail(&quot;Not yet implemented&quot;);
+<span class="fc" id="L119">	}</span>
+	@Test
+	public void testEncodeUrl_empty() throws UnsupportedEncodingException {
+<span class="fc" id="L122">		String input = null;</span>
+<span class="fc" id="L123">		String expected = null;</span>
+<span class="fc" id="L124">		String result = EmailUtils.encodeUrl(input);</span>
+		//System.out.println(result);
+<span class="fc" id="L126">		assertEquals(result, expected);</span>
+		//fail(&quot;Not yet implemented&quot;);
+<span class="fc" id="L128">	}</span>
+	@Test
+	public void testEncodeUrl_string_2() throws UnsupportedEncodingException {
+<span class="fc" id="L131">		String input = &quot;test%&quot;;</span>
+<span class="fc" id="L132">		String expected = &quot;test%25&quot;;		</span>
+<span class="fc" id="L133">		String result = EmailUtils.encodeUrl(input);</span>
+		//System.out.println(result);
+<span class="fc" id="L135">		assertEquals(result, expected);</span>
+		//fail(&quot;Not yet implemented&quot;);
+<span class="fc" id="L137">	}</span>
+
+    /**
+     * Convenience method to write a MimeMessage into a file.
+     *
+     * @param resultFile the file containing the MimeMessgae
+     * @param mimeMessage the MimeMessage to write
+     * @throws NamingException 
+     * @throws IOException writing the MimeMessage failed
+     * @throws MessagingException writing the MimeMessage failed
+     */
+	@Test(expected=IOException.class)
+	public void testWriteMimeMessage() throws  IOException, MessagingException, NamingException {
+<span class="nc" id="L150">		MimeMessage msg = new MimeMessage(googleSession);</span>
+<span class="nc" id="L151">		File resultFile = new File(&quot;/Users/joy/result.txt&quot;);</span>
+<span class="nc" id="L152">		EmailUtils.writeMimeMessage(resultFile, msg);</span>
+		//fail(&quot;Not yet implemented&quot;);
+<span class="nc" id="L154">	}</span>
+
+	
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.2.201409121644</span>EmailUtilsTest (May 2, 2015 9:11:25 PM)</div></body></html>
